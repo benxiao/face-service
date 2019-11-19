@@ -21,8 +21,11 @@ def get_encoding_from_photo(photo_in_bytes):
 
 
 def recognize(face_encoding_lookup, face_encoding):
-    return min([(name, np.linalg.norm(e - face_encoding))
-                for name, e in face_encoding_lookup.items()], key=lambda x: x[1])
+    return min([
+        (name, np.linalg.norm(e - face_encoding))
+        for name, e
+        in face_encoding_lookup.items()
+    ], key=lambda x: x[1])
 
 
 @app.route('/remember/<username>', methods=["POST"])

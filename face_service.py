@@ -7,11 +7,9 @@ from io import BytesIO
 
 tolerance = 0.6
 
-
 app = Flask(__name__)
 
-
-face_encodings = {} # can be replaced by database
+face_encodings = {}  # can be replaced by database
 
 
 def get_encoding_from_photo(photo_in_bytes):
@@ -24,7 +22,7 @@ def get_encoding_from_photo(photo_in_bytes):
 
 def recognize(face_encoding_lookup, face_encoding):
     return min([(name, np.linalg.norm(e - face_encoding))
-                      for name, e in face_encoding_lookup.items()], key=lambda x:x[1])
+                for name, e in face_encoding_lookup.items()], key=lambda x: x[1])
 
 
 @app.route('/remember/<username>', methods=["POST"])
@@ -67,29 +65,27 @@ def remember_somebody(username):
 def recognize_somebody():
     json_str = request.get_json()
     if json_str is None:
-        return jsonify({ "error": "no json payload" })
+        return jsonify({"error": "no json payload"})
     json_object = json.loads(json_str)
     if json_object.get('img') is None:
-        return jsonify({ "error": "bad payload" })
+        return jsonify({"error": "bad payload"})
 
     encoding = get_encoding_from_photo(base64.b64decode(json_object['img'].encode('utf-8')))
     if encoding is None:
-        return jsonify({ "error": "no face in photo" })
+        return jsonify({"error": "no face in photo"})
     if not face_encodings:
-        return jsonify({ "error": "face encodings is empty" })
+        return jsonify({"error": "face encodings is empty"})
 
     name, dist = recognize(face_encodings, encoding)
     if dist > tolerance:
-        return jsonify({ "error": "new face!" })
+        return jsonify({"error": "new face!"})
 
     return {
         "person": name,
-        "error":  None,
+        "error": None,
         "dist": dist
     }
 
 
 if __name__ == '__main__':
     app.run(port=5001, host='0.0.0.0')
-
-

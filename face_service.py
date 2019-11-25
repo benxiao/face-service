@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from waitress import serve
 import face_recognition
 import base64
 import json
@@ -91,4 +92,4 @@ def recognize_somebody():
 
 
 if __name__ == '__main__':
-    app.run(port=5001, host='0.0.0.0')
+    serve(app, port=5001, host='0.0.0.0')

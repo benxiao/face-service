@@ -106,9 +106,6 @@ def recognize_somebody():
     if len(encodings) > 1:
         return jsonify({"error": "more than one face in photo"})
 
-    if not face_encodings:
-        return jsonify({"error": "face encodings is empty"})
-
     encoding = encodings[0]
 
     name, dist = recognize(face_encodings, encoding)

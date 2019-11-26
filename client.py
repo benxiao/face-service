@@ -4,6 +4,13 @@ import json
 import click
 import os
 
+# access api-endpoint from os env
+try:
+    API_ENDPOINT = os.environ["FACE_SERVICE_API_ENDPOINT"]
+except KeyError:
+    API_ENDPOINT = "http://0.0.0.0:5001/face"
+    print('[WARN] environment variable "FACE_SERVICE_API_ENDPOINT" is not set')
+
 
 @click.group()
 def cli():
@@ -20,11 +27,13 @@ def face_command(cmd, **kwargs):
     json_str = json.dumps(json_obj)
 
     if cmd is "remember":
-        resp = requests.post(f"http://0.0.0.0:5001/remember/{kwargs['name']}", json=json_str)
+        resp = requests.post(API_ENDPOINT + f"/remember/{kwargs['name']}", json=json_str)
+
     elif cmd is "recognize":
-        resp = requests.post(f"http://0.0.0.0:5001/recognize", json=json_str)
+        resp = requests.post(API_ENDPOINT + "/recognize", json=json_str)
+
     else:
-        raise(ValueError("unknown command!"))
+        raise (ValueError("unknown command!"))
     return resp
 
 
@@ -45,8 +54,25 @@ def recognize(filename):
     print(resp.content)
 
 
+@click.command()
+def list_names():
+    resp = requests.get(API_ENDPOINT + "/list-names")
+    print("status_code:", resp.status_code)
+    print(resp.content)
+
+
+@click.command()
+@click.argument('name')
+def encoding(name):
+    resp = requests.get(API_ENDPOINT + f"/encoding/{name}")
+    print("status_code:", resp.status_code)
+    print(resp.content)
+
+
 cli.add_command(remember)
 cli.add_command(recognize)
+cli.add_command(list_names)
+cli.add_command(encoding)
 
 if __name__ == '__main__':
     cli()

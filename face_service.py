@@ -29,8 +29,13 @@ def recognize(face_encoding_lookup, face_encoding):
     ], key=lambda x: x[1])
 
 
-@app.route('/remember/<username>', methods=["POST"])
+@app.route('/face/remember/<username>', methods=["POST"])
 def remember_somebody(username):
+    if username in face_encodings:
+        return jsonify({
+            "error": "name already exist"
+        })
+
     json_str = request.get_json()
     if json_str is None:
         return jsonify({
@@ -65,7 +70,8 @@ def remember_somebody(username):
     })
 
 
-@app.route('/recognize', methods=['POST'])
+
+@app.route('/face/recognize', methods=['POST'])
 def recognize_somebody():
     json_str = request.get_json()
     if json_str is None:

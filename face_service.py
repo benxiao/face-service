@@ -5,6 +5,7 @@ import base64
 import json
 import numpy as np
 from io import BytesIO
+import sys
 
 tolerance = 0.6
 
@@ -70,6 +71,19 @@ def remember_somebody(username):
     })
 
 
+@app.route('/face/list-names', methods=['GET'])
+def list_faces():
+    return jsonify(list(face_encodings))
+
+
+@app.route('/face/encoding/<username>', methods=['GET'])
+def get_encoding(username):
+    if username not in face_encodings:
+        return jsonify({
+            "error": "name doesn't exist"
+        })
+    return jsonify({"name": username, "encoding": list(face_encodings[username])})
+
 
 @app.route('/face/recognize', methods=['POST'])
 def recognize_somebody():
@@ -98,4 +112,11 @@ def recognize_somebody():
 
 
 if __name__ == '__main__':
+    # try:
     serve(app, port=5001, host='0.0.0.0')
+    # except KeyboardInterrupt:
+    #     json_object = {name: list(encodings) for name, encodings in face_encodings.items()}
+    #     with open("encoding.json") as fp:
+    #         json.dump(json_object, fp)
+
+

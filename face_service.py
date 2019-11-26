@@ -5,6 +5,7 @@ import base64
 import json
 import numpy as np
 from io import BytesIO
+from pyfiglet import Figlet
 import sys
 
 tolerance = 0.6
@@ -112,11 +113,5 @@ def recognize_somebody():
 
 
 if __name__ == '__main__':
-    # try:
+    print(Figlet().renderText("FaceService"))
     serve(app, port=5001, host='0.0.0.0')
-    # except KeyboardInterrupt:
-    #     json_object = {name: list(encodings) for name, encodings in face_encodings.items()}
-    #     with open("encoding.json") as fp:
-    #         json.dump(json_object, fp)
-
-

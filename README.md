@@ -9,6 +9,14 @@ python client.py remember <name> <portrait image in jpg>
 ```shell script
 python client.py recognize <portrait image in jpg>
 ```
+### list all names remembered in our service
+```shell script
+python client.py list-names
+```
+### get face encoding for a remembered name
+```shell script
+python client.py encoding <name>
+```
 
 ## Installing 
 ```shell script

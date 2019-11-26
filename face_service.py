@@ -15,12 +15,10 @@ app = Flask(__name__)
 face_encodings = {}  # can be replaced by database
 
 
-def get_encoding_from_photo(photo_in_bytes):
+def get_encodings_from_photo(photo_in_bytes):
     photo_array = face_recognition.load_image_file(BytesIO(photo_in_bytes))
     locations = face_recognition.face_locations(photo_array)
-    if not locations:
-        return None
-    return face_recognition.face_encodings(photo_array, locations)[0]
+    return face_recognition.face_encodings(photo_array, locations)
 
 
 def recognize(face_encoding_lookup, face_encoding):
@@ -32,7 +30,7 @@ def recognize(face_encoding_lookup, face_encoding):
 
 
 @app.route('/face/remember/<username>', methods=["POST"])
-def remember_somebody(username):
+def remember(username):
     if username in face_encodings:
         return jsonify({
             "error": "name already exist"
@@ -50,12 +48,18 @@ def remember_somebody(username):
             "error": "bad payload!"
         })
 
-    encoding = get_encoding_from_photo(base64.b64decode(json_object['img'].encode('utf-8')))
-    if encoding is None:
+    encodings = get_encodings_from_photo(base64.b64decode(json_object['img'].encode('utf-8')))
+    if len(encodings) == 0:
         return jsonify({
             "error": "no face in photo"
         })
 
+    if len(encodings) > 1:
+        return jsonify({
+            "error": "more then one face in photo"
+        })
+
+    encoding = encodings[0]
     dist = tolerance
     if face_encodings:
         _, dist = recognize(face_encodings, encoding)
@@ -95,11 +99,17 @@ def recognize_somebody():
     if json_object.get('img') is None:
         return jsonify({"error": "bad payload"})
 
-    encoding = get_encoding_from_photo(base64.b64decode(json_object['img'].encode('utf-8')))
-    if encoding is None:
+    encodings = get_encodings_from_photo(base64.b64decode(json_object['img'].encode('utf-8')))
+    if len(encodings) == 0:
         return jsonify({"error": "no face in photo"})
+
+    if len(encodings) > 1:
+        return jsonify({"error": "more than one face in photo"})
+
     if not face_encodings:
         return jsonify({"error": "face encodings is empty"})
+
+    encoding = encodings[0]
 
     name, dist = recognize(face_encodings, encoding)
     if dist > tolerance:

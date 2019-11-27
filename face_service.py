@@ -6,13 +6,14 @@ import json
 import numpy as np
 from io import BytesIO
 from pyfiglet import Figlet
-import sys
+from db import FaceDB
+
 
 tolerance = 0.6
 
 app = Flask(__name__)
 
-face_encodings = {}  # can be replaced by database
+db = FaceDB()
 
 
 def get_encodings_from_photo(photo_in_bytes):
@@ -31,6 +32,7 @@ def recognize(face_encoding_lookup, face_encoding):
 
 @app.route('/face/remember/<username>', methods=["POST"])
 def remember(username):
+    face_encodings = db.load_table()
     if username in face_encodings:
         return jsonify({
             "error": "name already exist"
@@ -68,7 +70,7 @@ def remember(username):
             "error": "face already exist!"
         })
 
-    face_encodings[username] = encoding
+    db.remember(username, encoding)
     return jsonify({
         "person": username,
         "encoded": True,
@@ -77,12 +79,13 @@ def remember(username):
 
 
 @app.route('/face/list-names', methods=['GET'])
-def list_faces():
-    return jsonify(list(face_encodings))
+def list_people():
+    return jsonify(list(db.load_table()))
 
 
 @app.route('/face/encoding/<username>', methods=['GET'])
 def get_encoding(username):
+    face_encodings = db.load_table()
     if username not in face_encodings:
         return jsonify({
             "error": "name doesn't exist"
@@ -95,6 +98,7 @@ def recognize_somebody():
     json_str = request.get_json()
     if json_str is None:
         return jsonify({"error": "no json payload"})
+
     json_object = json.loads(json_str)
     if json_object.get('img') is None:
         return jsonify({"error": "bad payload"})
@@ -108,7 +112,7 @@ def recognize_somebody():
 
     encoding = encodings[0]
 
-    name, dist = recognize(face_encodings, encoding)
+    name, dist = recognize(db.load_table(), encoding)
     if dist > tolerance:
         return jsonify({"error": "new face!"})
 

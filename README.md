@@ -17,20 +17,17 @@ python client.py list-names
 ```shell script
 python client.py encoding <name>
 ```
-
 ## Installing 
 ```shell script
 pip install -r requirements.txt
 ```
-
 ## Start server
 ```shell script
 python face_service.py
 ```
-
 ## Docker
 ```shell script
-cd path/face-service
+cd <path>/face-service
 ```
 ```shell script
 docker build -t face-service:v0.1 .

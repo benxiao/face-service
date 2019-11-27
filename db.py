@@ -52,6 +52,9 @@ class FaceDB:
             )
         self._conn.commit()
 
+    def __del__(self):
+        self._conn.close()
+
 
 if __name__ == '__main__':
     face_db = FaceDB()

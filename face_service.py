@@ -10,9 +10,7 @@ from db import FaceDB
 
 
 tolerance = 0.6
-
 app = Flask(__name__)
-
 db = FaceDB()
 
 
@@ -69,7 +67,6 @@ def remember(username):
         return jsonify({
             "error": "face already exist!"
         })
-
     db.remember(username, encoding)
     return jsonify({
         "person": username,
@@ -94,7 +91,7 @@ def get_encoding(username):
 
 
 @app.route('/face/recognize', methods=['POST'])
-def recognize_somebody():
+def recognize():
     json_str = request.get_json()
     if json_str is None:
         return jsonify({"error": "no json payload"})

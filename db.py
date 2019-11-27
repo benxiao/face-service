@@ -1,15 +1,21 @@
 import pymysql
 import json
 import numpy as np
+import os
 
 
 class FaceDB:
-    def __init__(self):
-        self._conn = pymysql.connect(user="root",
-                                     password='Applecider1',
-                                     database="faces",
-                                     port=3306,
-                                     host="172.17.0.2")
+    def __init__(self, config="db.json"):
+        if not os.path.isfile(config):
+            raise ValueError(f"{config} not found")
+
+        with open(config) as fp:
+            json_obj = json.load(fp)
+        self._conn = pymysql.connect(user=json_obj['user'],
+                                     password=json_obj['password'],
+                                     database=json_obj['database'],
+                                     port=json_obj['port'],
+                                     host=json_obj['host'])
 
     def clear(self):
         with self._conn.cursor() as cursor:

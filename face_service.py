@@ -21,11 +21,11 @@ def get_encodings_from_photo(photo_in_bytes):
 
 
 def recognize(face_encoding_lookup, face_encoding):
-    return min([
+    return min((
         (name, np.linalg.norm(e - face_encoding))
         for name, e
         in face_encoding_lookup.items()
-    ], key=lambda x: x[1])
+    ), key=lambda x: x[1])
 
 
 @app.route('/face/remember/<username>', methods=["POST"])
@@ -67,6 +67,7 @@ def remember(username):
         return jsonify({
             "error": "face already exist!"
         })
+
     db.remember(username, encoding)
     return jsonify({
         "person": username,

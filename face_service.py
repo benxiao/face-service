@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from waitress import serve
 import face_recognition
+import imghdr
 import base64
 import json
 import numpy as np
@@ -20,7 +21,7 @@ def get_encodings_from_photo(photo_in_bytes):
     return face_recognition.face_encodings(photo_array, locations)
 
 
-def recognize(face_encoding_lookup, face_encoding):
+def recognize_from(face_encoding_lookup, face_encoding):
     return min((
         (name, np.linalg.norm(e - face_encoding))
         for name, e
@@ -48,7 +49,12 @@ def remember(username):
             "error": "bad payload!"
         })
 
-    encodings = get_encodings_from_photo(base64.b64decode(json_object['img'].encode('utf-8')))
+    image_bytes = base64.b64decode(json_object['img'].encode('utf-8'))
+    inferred_format = imghdr.what(BytesIO(image_bytes))
+    if inferred_format not in ("jpeg", "jpg"):
+        return jsonify({"error": f"img is not a valid jpg, its a {inferred_format}"})
+
+    encodings = get_encodings_from_photo(image_bytes)
     if len(encodings) == 0:
         return jsonify({
             "error": "no face in photo"
@@ -101,7 +107,12 @@ def recognize():
     if json_object.get('img') is None:
         return jsonify({"error": "bad payload"})
 
-    encodings = get_encodings_from_photo(base64.b64decode(json_object['img'].encode('utf-8')))
+    image_bytes = base64.b64decode(json_object['img'].encode('utf-8'))
+    inferred_format = imghdr.what(BytesIO(image_bytes))
+    if inferred_format not in ("jpeg", "jpg"):
+        return jsonify({"error": f"img is not a valid jpg, its a {inferred_format}"})
+
+    encodings = get_encodings_from_photo(image_bytes)
     if len(encodings) == 0:
         return jsonify({"error": "no face in photo"})
 
@@ -110,7 +121,7 @@ def recognize():
 
     encoding = encodings[0]
 
-    name, dist = recognize(db.load_table(), encoding)
+    name, dist = recognize_from(db.load_table(), encoding)
     if dist > tolerance:
         return jsonify({"error": "new face!"})
 

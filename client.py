@@ -47,7 +47,7 @@ def face_command(cmd, **kwargs):
 def remember(name, filename):
     resp = face_command("remember", name=name, filename=filename)
     print("status_code:", resp.status_code)
-    print(resp.content)
+    print(resp.content.decode("utf-8"))
 
 
 @click.command()
@@ -55,14 +55,14 @@ def remember(name, filename):
 def recognize(filename):
     resp = face_command("recognize", filename=filename)
     print("status_code:", resp.status_code)
-    print(resp.content)
+    print(resp.content.decode("utf-8"))
 
 
 @click.command()
 def list_names():
     resp = requests.get(API_ENDPOINT + "/list-names")
     print("status_code:", resp.status_code)
-    print(resp.content)
+    print(resp.content.decode("utf-8"))
 
 
 @click.command()
@@ -70,7 +70,7 @@ def list_names():
 def encoding(name):
     resp = requests.get(API_ENDPOINT + f"/encoding/{name}")
     print("status_code:", resp.status_code)
-    print(resp.content)
+    print(resp.content.decode("utf-8"))
 
 
 cli.add_command(remember)

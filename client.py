@@ -3,6 +3,7 @@ import base64
 import json
 import click
 import os
+import imghdr
 
 # access api-endpoint from os env
 try:
@@ -21,6 +22,9 @@ def face_command(cmd, **kwargs):
     filename = kwargs['filename']
     if not os.path.isfile(filename):
         raise ValueError(f"{filename} not found")
+    inferred_file_format = imghdr.what(filename)
+    if inferred_file_format not in ("jpg", "jpeg"):
+        raise ValueError(f"image is not a valid jpg file!, its a {inferred_file_format}")
     photo_bytes = open(filename, "rb").read()
     base64encoded = base64.b64encode(photo_bytes)
     json_obj = {"img": base64encoded.decode("utf-8")}
@@ -73,6 +77,7 @@ cli.add_command(remember)
 cli.add_command(recognize)
 cli.add_command(list_names)
 cli.add_command(encoding)
+
 
 if __name__ == '__main__':
     cli()

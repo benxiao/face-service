@@ -35,7 +35,7 @@ class FaceDB:
             cursor.execute("select count(*) from person")
             return cursor.fetchone()[0]
 
-    def load_table(self):
+    def load_encodings(self):
         with self._conn.cursor() as cursor:
             cursor.execute("select * from person")
             ret = {}
@@ -75,4 +75,4 @@ if __name__ == '__main__':
     face_db = FaceDB()
     face_db.clear()
     face_db.populate_with_sample_data()
-    print(face_db.load_table())
+    print(face_db.load_encodings())

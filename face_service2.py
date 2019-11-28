@@ -13,7 +13,7 @@ from pyfiglet import Figlet
 from db import FaceDB
 
 
-tolerance = 0.55
+TOLERANCE = 0.55
 app = Flask(__name__)
 api = Api(app)
 db = FaceDB()
@@ -42,7 +42,7 @@ def recognize_from(face_encoding_lookup, face_encoding):
 
 class RememberFace(Resource):
     def post(self, username):
-        face_encodings = db.load_table()
+        face_encodings = db.load_encodings()
         if username in face_encodings:
             return {"error": "name already exists"}, RC_FORBIDDEN
 
@@ -72,11 +72,11 @@ class RememberFace(Resource):
             return {"error": "more then one face in photo"}, RC_BAD_REQUEST
 
         encoding = encodings[0]
-        dist = tolerance
+        dist = TOLERANCE
         if face_encodings:
             _, dist = recognize_from(face_encodings, encoding)
 
-        if dist < tolerance:
+        if dist < TOLERANCE:
             return {"error": "face already exist!"}, RC_CONFLICT
 
         db.remember(username, encoding)
@@ -85,12 +85,12 @@ class RememberFace(Resource):
 
 class ListUsers(Resource):
     def get(self):
-        return list(db.load_table()), RC_OK
+        return list(db.load_encodings()), RC_OK
 
 
 class FaceEncoding(Resource):
     def get(self, username):
-        face_encodings = db.load_table()
+        face_encodings = db.load_encodings()
         if username not in face_encodings:
             return {"error": "name doesn't exist"}, RC_NOT_FOUND
         return {"name": username, "encoding": list(face_encodings[username])}, RC_OK
@@ -119,11 +119,11 @@ class FaceRecognition(Resource):
         if len(encodings) == 0:
             return {"error": "no face in photo"}, RC_NOT_FOUND
 
-        face_encodings = db.load_table()
+        face_encodings = db.load_encodings()
         lst = []
         for l, e in zip(locations, encodings):
             name, dist = recognize_from(face_encodings, e)
-            if dist > tolerance:
+            if dist > TOLERANCE:
                 lst.append({"name": "unknown", "dist": dist, "location": list(l)})
             else:
                 lst.append({"name": name, "dist": dist, "location": list(l)})
@@ -133,7 +133,7 @@ class FaceRecognition(Resource):
 
 class ForgetFace(Resource):
     def delete(self, username):
-        face_encodings = db.load_table()
+        face_encodings = db.load_encodings()
         if username not in face_encodings:
             return {"error": "name does not exist"}, RC_NOT_FOUND
 
@@ -156,7 +156,6 @@ class CompareFace(Resource):
             return {"error": "bad payload"}, 400
 
         two_encodings = []
-
         for fn in ["img0", "img1"]:
             image_bytes = base64.b64decode(json_object[fn].encode('utf-8'))
             inferred_format = imghdr.what(BytesIO(image_bytes))
@@ -174,7 +173,8 @@ class CompareFace(Resource):
             two_encodings.append(encodings[0])
 
         e0, e1 = two_encodings
-        return {"dist": np.linalg.norm(e0-e1)}, RC_OK
+        dist = np.linalg.norm(e0-e1)
+        return {"dist": dist, "same_indivdual?": str(dist < TOLERANCE)}, RC_OK
 
 
 api.add_resource(RememberFace, '/face/remember/<string:username>')

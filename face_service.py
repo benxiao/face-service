@@ -31,7 +31,7 @@ def recognize_from(face_encoding_lookup, face_encoding):
 
 @app.route('/face/remember/<username>', methods=["POST"])
 def remember(username):
-    face_encodings = db.load_table()
+    face_encodings = db.load_encodings()
     if username in face_encodings:
         return jsonify({
             "error": "name already exist"
@@ -84,12 +84,12 @@ def remember(username):
 
 @app.route('/face/list-names', methods=['GET'])
 def list_people():
-    return jsonify(list(db.load_table()))
+    return jsonify(list(db.load_encodings()))
 
 
 @app.route('/face/encoding/<username>', methods=['GET'])
 def get_encoding(username):
-    face_encodings = db.load_table()
+    face_encodings = db.load_encodings()
     if username not in face_encodings:
         return jsonify({
             "error": "name doesn't exist"
@@ -121,7 +121,7 @@ def recognize():
 
     encoding = encodings[0]
 
-    name, dist = recognize_from(db.load_table(), encoding)
+    name, dist = recognize_from(db.load_encodings(), encoding)
     if dist > tolerance:
         return jsonify({"error": "new face!"})
 
@@ -134,7 +134,7 @@ def recognize():
 
 @app.route('/face/forget/<username>', methods=['DELETE'])
 def forget(username):
-    face_encodings = db.load_table()
+    face_encodings = db.load_encodings()
     if username not in face_encodings:
         return jsonify({"error": "name does not exist"})
 

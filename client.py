@@ -71,11 +71,22 @@ def forget(name):
     print(resp.content.decode("utf-8"))
 
 
+@click.command()
+@click.argument('fn0')
+@click.argument('fn1')
+def compare(fn0, fn1):
+    json_str = json.dumps({"img0":base64str_from_imagefile(fn0), "img1":base64str_from_imagefile(fn1)})
+    resp = requests.post(API_ENDPOINT + "/compare", json=json_str)
+    print("status_code:", resp.status_code)
+    print(resp.content.decode("utf-8"))
+
+
 cli.add_command(remember)
 cli.add_command(recognize)
 cli.add_command(list_names)
 cli.add_command(encoding)
 cli.add_command(forget)
+cli.add_command(compare)
 
 
 if __name__ == '__main__':

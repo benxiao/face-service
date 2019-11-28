@@ -141,11 +141,48 @@ class ForgetFace(Resource):
         return {"message": f"{username} is deleted"}, RC_OK
 
 
+class CompareFace(Resource):
+    def post(self):
+        json_str = request.get_json()
+        if json_str is None:
+            return {"error": "no json payload"}
+
+        try:
+            json_object = json.loads(json_str)
+        except:
+            return {"error": "not valid json"}, RC_BAD_REQUEST
+
+        if (json_object.get('img0') is None) or (json_object.get("img1") is None):
+            return {"error": "bad payload"}, 400
+
+        two_encodings = []
+
+        for fn in ["img0", "img1"]:
+            image_bytes = base64.b64decode(json_object[fn].encode('utf-8'))
+            inferred_format = imghdr.what(BytesIO(image_bytes))
+            if inferred_format not in ("jpeg", "jpg"):
+                return {"error": f"img is not a valid jpg, its a {inferred_format}"}, RC_BAD_REQUEST
+
+            _, encodings = get_encodings_from_photo(image_bytes)
+
+            if len(encodings) == 0:
+                return {"error": "no face in photo"}, RC_NOT_FOUND
+
+            if len(encodings) > 1:
+                return {"error": "only one face is allowed in photo"}, RC_FORBIDDEN
+
+            two_encodings.append(encodings[0])
+
+        e0, e1 = two_encodings
+        return {"dist": np.linalg.norm(e0-e1)}, RC_OK
+
+
 api.add_resource(RememberFace, '/face/remember/<string:username>')
 api.add_resource(ListUsers, '/face/list-names')
 api.add_resource(FaceEncoding, '/face/encoding/<string:username>')
 api.add_resource(FaceRecognition, '/face/recognize')
 api.add_resource(ForgetFace, '/face/forget/<string:username>')
+api.add_resource(CompareFace, '/face/compare')
 
 
 if __name__ == '__main__':

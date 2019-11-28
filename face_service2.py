@@ -116,10 +116,10 @@ class FaceRecognition(Resource):
 
         encodings = get_encodings_from_photo(image_bytes)
         if len(encodings) == 0:
-            return {"error": "no face in photo"}
+            return {"error": "no face in photo"}, RC_NOT_FOUND
 
         if len(encodings) > 1:
-            return {"error": "more than one face in photo"}
+            return {"error": "more than one face in photo"}, RC_FORBIDDEN
 
         encoding = encodings[0]
 

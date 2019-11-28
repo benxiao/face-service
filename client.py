@@ -73,10 +73,20 @@ def encoding(name):
     print(resp.content.decode("utf-8"))
 
 
+@click.command()
+@click.argument('name')
+def forget(name):
+    resp = requests.delete(API_ENDPOINT+f"/forget/{name}")
+    print("status_code:", resp.status_code)
+    print(resp.content.decode("utf-8"))
+
+
+
 cli.add_command(remember)
 cli.add_command(recognize)
 cli.add_command(list_names)
 cli.add_command(encoding)
+cli.add_command(forget)
 
 
 if __name__ == '__main__':

@@ -58,6 +58,15 @@ class FaceDB:
             )
         self._conn.commit()
 
+    def forget(self, name):
+        with self._conn.cursor() as cursor:
+            cursor.execute(
+                """
+                    delete from person where name = %s
+                """, (name,)
+            )
+        self._conn.commit()
+
     def __del__(self):
         self._conn.close()
 

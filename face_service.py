@@ -68,7 +68,7 @@ def remember(username):
     encoding = encodings[0]
     dist = tolerance
     if face_encodings:
-        _, dist = recognize(face_encodings, encoding)
+        _, dist = recognize_from(face_encodings, encoding)
     if dist < tolerance:
         return jsonify({
             "error": "face already exist!"
@@ -130,6 +130,16 @@ def recognize():
         "error": None,
         "dist": dist
     }
+
+
+@app.route('/face/forget/<username>', methods=['DELETE'])
+def forget(username):
+    face_encodings = db.load_table()
+    if username not in face_encodings:
+        return jsonify({"error": "name does not exist"})
+
+    db.forget(username)
+    return jsonify({"error:": None, "message": f"{username} is deleted"})
 
 
 if __name__ == '__main__':

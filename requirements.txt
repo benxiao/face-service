@@ -6,3 +6,4 @@ requests==2.22.0
 click==7.0
 pyfiglet
 pymysql==0.9.3
+flask-restful==0.3.7

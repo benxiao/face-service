@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM face-recognition:v1.2.2
 MAINTAINER ranxiao
 
 # update install and clean

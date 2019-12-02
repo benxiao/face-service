@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+
+  face-service:
+    build: .
+    links:
+      - mysqldb
+    ports:
+      - '5001:5001'
+    depends_on:
+      - mysqldb
+
+  mysqldb:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: '2138'
+    volumes:
+      - ~/docker_storage/mysql:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+
+
+
+

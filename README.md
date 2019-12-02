@@ -17,22 +17,15 @@ python client.py list-names
 ```shell script
 python client.py encoding <name>
 ```
-### get all the remembered names
-```shell script
-python client.py list-names
-```
 ### forget someone
 ```shell script
 python client.py forget <name>
 ```
-
 ## Installing 
 ```shell script
-pip install -r requirements.txt
-```
-## Start server
-```shell script
-python face_service2.py
+git clone https://github.com/ageitgey/face_recognition.git
+cd face_recognition
+docker build -t face-recognition:v1.2.2 . # base image
 ```
 ## Docker-Compose
 ```shell script

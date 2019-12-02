@@ -17,6 +17,9 @@ services:
       MYSQL_ROOT_PASSWORD: '2138'
     volumes:
       - ~/docker_storage/mysql:/var/lib/mysql
+      # If you would like to do additional initialization in
+      # an image derived from this one, add one or more *.sql,
+      # *.sql.gz, or *.sh scripts under /docker-entrypoint-initdb.d
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
 

@@ -1,0 +1,8 @@
+{
+  "user": "root",
+  "password": "2138",
+  "database": "faces",
+  "port": 3306,
+  "host": "mysqldb"
+
+}

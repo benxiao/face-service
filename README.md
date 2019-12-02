@@ -34,10 +34,10 @@ pip install -r requirements.txt
 ```shell script
 python face_service2.py
 ```
-## Docker
+## Docker-Compose
 ```shell script
-cd <path>/face-service
+cd <path>/restful-face
 ```
 ```shell script
-docker build -t face-service:v0.1 .
+docker-compose up -d
 ```

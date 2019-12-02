@@ -2,5 +2,4 @@
 data
 images
 __pycache__
-db.json
 tmp
